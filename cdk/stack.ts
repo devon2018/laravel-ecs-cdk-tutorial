@@ -156,7 +156,7 @@ export class CDKStack extends cdk.Stack {
     const dbCredentialsSecret = new rds.DatabaseSecret(
       this,
       buildResourceId("db-secret"),
-      { secretName: buildResourceId("db-secret"), username: "dbx" }
+      { secretName: buildResourceId("db-secret"), username: "dbusername" }
     );
 
     const parameterGroup = new rds.ParameterGroup(
