@@ -1,5 +1,4 @@
 FROM php:8.2-fpm
-# FROM php:8.2-fpm
 
 WORKDIR /var/www
 
@@ -85,7 +84,6 @@ RUN yarn install && yarn cache clean
 RUN yarn build-all
 
 RUN chmod +x /var/www/docker/kraken.sh
-RUN chmod +x /var/www/docker/kraken-task.sh
 
 
 EXPOSE 80
