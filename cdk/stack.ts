@@ -103,6 +103,7 @@ export class CDKStack extends cdk.Stack {
       publicReadAccess: true,
       accessControl: s3.BucketAccessControl.PUBLIC_READ,
     });
+
     const privateBucket = new s3.Bucket(
       this,
       buildResourceId("private-bucket"),
@@ -398,17 +399,6 @@ export class CDKStack extends cdk.Stack {
       });
     }
 
-    new route53.ARecord(this, buildResourceId("admin-dns-a-record"), {
-      recordName: "admin",
-      zone: publicHostedZone,
-      target: route53.RecordTarget.fromAlias(
-        new cdk.aws_route53_targets.LoadBalancerTarget(
-          fargateService.loadBalancer
-        )
-      ),
-      ttl: Duration.minutes(1),
-    });
-
     fargateService.taskDefinition.taskRole.addManagedPolicy(
       ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")
     );
@@ -429,21 +419,6 @@ export class CDKStack extends cdk.Stack {
 
     fargateService?.taskDefinition?.executionRole?.addManagedPolicy(
       ManagedPolicy.fromAwsManagedPolicyName("AmazonS3FullAccess")
-    );
-
-    const dockerSecret = cdk.aws_secretsmanager.Secret.fromSecretCompleteArn(
-      this,
-      buildResourceId("docker-secret"),
-      "arn:aws:secretsmanager:eu-west-2:473705704879:secret:docker-hub-bD8lyp"
-    );
-
-    dockerSecret.grantRead(fargateService.taskDefinition.taskRole);
-
-    fargateService.taskDefinition.addToTaskRolePolicy(
-      new PolicyStatement({
-        actions: ["secretsmanager:GetSecretValue"],
-        resources: ["arn:aws:secretsmanager:*:*:secret:docker-hub-bD8lyp"],
-      })
     );
 
     cacheClusterConnections.allowDefaultPortFrom(fargateService.service);
